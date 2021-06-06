@@ -1,0 +1,45 @@
+{
+  "main": [
+    "",
+    "Your Ping: &a{PING}ms",
+    "",
+    "K: &a{KILLS} &fD: &a{DEATHS}",
+    "KDR: &a{KDR}",
+    "",
+    "W: &a{WINS} &fL: &a{LOSES}",
+    "WLR: &a{WLR}",
+    "",
+    "&ewww.withergames.com"
+  ],
+  "waiting": [
+    "",
+    "Waiting...",
+    "",
+    "Map:&a {MAP}",
+    "Mode: {MODE}",
+    "",
+    "&ewww.withergames.com"
+  ],
+  "starting": [
+    "",
+    "Starting in&a {COUNTDOWN}s",
+    "",
+    "Map:&a {MAP}",
+    "Mode: {MODE}",
+    "",
+    "&ewww.withergames.com"
+  ],
+  "running": [
+    "",
+    "Time left: &a{TIME}",
+    "",
+    "&lOpponent",
+    "  &a{OPPONENT} &c{OPPONENT_HEALTH}",
+    "",
+    "Your Ping:&a {PING}",
+    "Their Ping: &a{OPPONENT_PING}",
+    "",
+    "",
+    "&ewww.withergames.com"
+  ]
+}

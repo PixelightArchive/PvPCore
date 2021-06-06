@@ -1,0 +1,19 @@
+{
+  "kit-1": {
+    "armor": [
+      {
+        "id": "314",
+        "enchantments": []
+      }
+    ],
+    "items": [
+      {
+        "id": "276",
+        "customName": "&l&bSWORD",
+        "enchantments": [
+          "SHARPNESS:2"
+        ]
+      }
+    ]
+  }
+}

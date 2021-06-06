@@ -1,0 +1,10 @@
+name: PvPCore
+author: davewats
+main: Davewats\PvPCore\PvPCore
+version: 0.0.1
+description: A minigame
+api: 4.0.0
+permissions:
+  pvpcore.admin:
+    default: op
+    description: "Access to arena management and creation tools."
