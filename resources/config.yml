@@ -14,4 +14,6 @@ mysql:
 scoreboard:
   main: "&l&eWITHERGAMES"
   duel: "&l&eDUELS"
+
+gameChat: "{PLAYER}: {msg}"
 ...

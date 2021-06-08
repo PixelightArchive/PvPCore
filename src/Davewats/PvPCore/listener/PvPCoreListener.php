@@ -139,7 +139,7 @@ class PvPCoreListener implements Listener
         $session = $this->getPlugin()->getSessionManager()->getSession($player->getUniqueId()->toString());
         $duel = $session->getDuel();
         if ($session->isInDuel()) {
-            $duel->broadcastMessage($event->getMessage(), ["{PLAYER}" => $session->getStatus() === PlayerStatusConstants::PLAYER_STATUS_SPECTATOR]);
+            $duel->broadcastMessage($this->plugin->getConfig()->get("gameChat"), ["{PLAYER}" => $session->getStatus() === PlayerStatusConstants::PLAYER_STATUS_SPECTATOR]);
             $event->cancel();
         }
     }

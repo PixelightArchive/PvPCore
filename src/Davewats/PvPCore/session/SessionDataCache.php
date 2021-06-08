@@ -43,10 +43,13 @@ class SessionDataCache
 
     public function getKDR(): float
     {
-        if ($this->getKills() <= 0 || $this->getDeaths() <= 0) {
-            return 0.0;
+        $kdr = 0.0;
+        try {
+            $kdr = $this->getKills() / $this->getDeaths();
+        } catch (\Exception $exception) {
+            $kdr = 0.0;
         }
-        return $this->getKills() / $this->getDeaths();
+        return $kdr;
     }
 
     public function getKills(): int
