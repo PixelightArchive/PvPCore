@@ -23,6 +23,7 @@ class PlayerDataRegisterTask extends MySQLQueryTask
         $xuid = $this->getXuid();
         $statement->bind_param("s", $xuid);
         $statement->execute();
+        $statement->close();
     }
 
     public function getXuid(): string

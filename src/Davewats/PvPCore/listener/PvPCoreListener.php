@@ -109,11 +109,11 @@ class PvPCoreListener implements Listener
         if (!$player instanceof Player) {
             return;
         }
-        $session = $this->getPlugin()->getSessionManager()->getSession($player->getUniqueId()->toString());
         if ($event->getTo()->getWorld()->getFolderName() === $this->getPlugin()->getServer()->getWorldManager()->getDefaultWorld()->getFolderName()) {
-            if ($session->isInDuel()) {
-                $session->getDuel()->removeFromDuel($session, $session->getDuel()->isAlive($session->getPlayer()->getUniqueId()->toString()));
-            }
+//        $session = $this->getPlugin()->getSessionManager()->getSession($player->getUniqueId()->toString());
+//            if ($session->isInDuel()) {
+//                $session->getDuel()->removeFromDuel($session, $session->getDuel()->isAlive($session->getPlayer()->getUniqueId()->toString()));
+//            }
             $player->getInventory()->clearAll();
             $player->getArmorInventory()->clearAll();
             $player->getCursorInventory()->clearAll();
@@ -363,20 +363,26 @@ class PvPCoreListener implements Listener
         }
         $session = $this->getPlugin()->getSessionManager()->getSession($player->getUniqueId()->toString());
         $duel = $session->getDuel();
-        if (!$session->isInDuel() && $player->getHealth() - $event->getBaseDamage() <= 0) {
-            $session->getDataCache()->setDeaths($session->getDataCache()->getDeaths() + 1);
-            $session->getDataCache()->setStreak(0);
-            if ($event instanceof EntityDamageByEntityEvent) {
-                $causer = $event->getDamager();
-                if ($causer instanceof Player) {
-                    $causerSession = $this->getPlugin()->getSessionManager()->getSession($causer->getUniqueId()->toString());
-                    $causerSession->getDataCache()->setKills($causerSession->getDataCache()->getKills() + 1);
-                    $causerSession->getDataCache()->setStreak($causerSession->getDataCache()->getStreak() + 1);
-                    foreach ($this->getPlugin()->getSessionManager()->getSessions() as $broadcastReceiver) {
-                        if ($broadcastReceiver->isInDuel()) {
-                            continue;
+        if (!$session->isInDuel()) {
+            if ($player->getWorld()->getFolderName() === $this->getPlugin()->getServer()->getWorldManager()->getDefaultWorld()->getFolderName()) {
+                $event->cancel();
+                return;
+            }
+            if ($player->getHealth() - $event->getBaseDamage() <= 0) {
+                $session->getDataCache()->setDeaths($session->getDataCache()->getDeaths() + 1);
+                $session->getDataCache()->setStreak(0);
+                if ($event instanceof EntityDamageByEntityEvent) {
+                    $causer = $event->getDamager();
+                    if ($causer instanceof Player) {
+                        $causerSession = $this->getPlugin()->getSessionManager()->getSession($causer->getUniqueId()->toString());
+                        $causerSession->getDataCache()->setKills($causerSession->getDataCache()->getKills() + 1);
+                        $causerSession->getDataCache()->setStreak($causerSession->getDataCache()->getStreak() + 1);
+                        foreach ($this->getPlugin()->getSessionManager()->getSessions() as $broadcastReceiver) {
+                            if ($broadcastReceiver->isInDuel()) {
+                                continue;
+                            }
+                            $broadcastReceiver->getPlayer()->sendMessage(Language::getMessage("ffaDeathMessages", ["{PLAYER}" => $session->getPlayer()->getName(), "{KILLER}" => $causer->getName()], true));
                         }
-                        $broadcastReceiver->getPlayer()->sendMessage(Language::getMessage("ffaDeathMessages", ["{PLAYER}" => $session->getPlayer()->getName(), "{KILLER}" => $causer->getName()], true));
                     }
                 }
             }
