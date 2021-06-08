@@ -27,13 +27,15 @@ abstract class SetupMode
 
     final public function activate(): void
     {
-        $this->getSession()->getPlayer()->getInventory()->clearAll();
-        $this->getSession()->getPlayer()->getArmorInventory()->clearAll();
-        $this->getSession()->getPlayer()->getCursorInventory()->clearAll();
-        $this->getSession()->getPlayer()->setGamemode(GameMode::CREATIVE());
-        $this->session->getPlayer()->getInventory()->setItem(8, ItemFactory::getInstance()->get(ItemIds::BED, 14)->setCustomName(TextFormat::RESET . TextFormat::RED . "Quit Setup Mode"));
-        $this->activated = true;
-        $this->onActivate();
+        if ($this->getSession()->getPlayer()->isConnected()) {
+            $this->getSession()->getPlayer()->getInventory()->clearAll();
+            $this->getSession()->getPlayer()->getArmorInventory()->clearAll();
+            $this->getSession()->getPlayer()->getCursorInventory()->clearAll();
+            $this->getSession()->getPlayer()->setGamemode(GameMode::CREATIVE());
+            $this->getSession()->getPlayer()->getInventory()->setItem(8, ItemFactory::getInstance()->get(ItemIds::BED, 14)->setCustomName(TextFormat::RESET . TextFormat::RED . "Quit Setup Mode"));
+            $this->activated = true;
+            $this->onActivate();
+        }
     }
 
     final protected function getSession(): Session

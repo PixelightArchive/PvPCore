@@ -12,21 +12,24 @@ use Davewats\PvPCore\language\Language;
 use Davewats\PvPCore\PvPCore;
 use Davewats\PvPCore\session\setup\DuelSetupMode;
 use Davewats\PvPCore\session\setup\ParkourSetupMode;
+use Davewats\PvPCore\task\RecursiveDeletionTask;
 use Davewats\PvPCore\utils\Utils;
+use pocketmine\event\block\BlockBreakEvent;
 use pocketmine\event\block\BlockPlaceEvent;
 use pocketmine\event\entity\EntityDamageByEntityEvent;
 use pocketmine\event\entity\EntityDamageEvent;
+use pocketmine\event\entity\EntityTeleportEvent;
 use pocketmine\event\Listener;
 use pocketmine\event\player\PlayerChatEvent;
 use pocketmine\event\player\PlayerDeathEvent;
 use pocketmine\event\player\PlayerDropItemEvent;
+use pocketmine\event\player\PlayerExhaustEvent;
 use pocketmine\event\player\PlayerInteractEvent;
 use pocketmine\event\player\PlayerItemUseEvent;
 use pocketmine\event\player\PlayerJoinEvent;
 use pocketmine\event\player\PlayerLoginEvent;
 use pocketmine\event\player\PlayerMoveEvent;
 use pocketmine\event\player\PlayerQuitEvent;
-use pocketmine\item\Item;
 use pocketmine\item\ItemFactory;
 use pocketmine\item\ItemIds;
 use pocketmine\player\Player;
@@ -82,19 +85,43 @@ class PvPCoreListener implements Listener
         $player->getInventory()->setItem(6, ItemFactory::getInstance()->get(ItemIds::DIAMOND_SWORD)->setCustomName(TextFormat::RESET . TextFormat::BOLD . TextFormat::YELLOW . "Duels"));
     }
 
-//    FIXME: recursive call.
-//    public function onTeleport(EntityTeleportEvent $event): void
-//    {
-//        $player = $event->getEntity();
-//        if (!$player instanceof Player) {
-//            return;
-//        }
-//        $session = $this->getPlugin()->getSessionManager()->getSession($player->getUniqueId()->toString());
-//        $duel = $session->getDuel();
-//        if (!$event->getFrom()->equals($event->getTo()) && $session->isInDuel()) {
-//            $duel->removeFromDuel($session, $duel->isAlive($session->getPlayer()->getUniqueId()->toString()));
-//        }
-//    }
+    public function onDrop(PlayerDropItemEvent $event): void
+    {
+        $event->cancel();
+    }
+
+    public function onBreak(BlockBreakEvent $event): void
+    {
+        $player = $event->getPlayer();
+        $session = $this->getPlugin()->getSessionManager()->getSession($player->getUniqueId()->toString());
+        if ($session->isInDuel()) {
+            return;
+        }
+        if ($player->hasPermission("pvpcore.admin") && $player->isCreative()) {
+            return;
+        }
+        $event->cancel();
+    }
+
+    public function onTeleport(EntityTeleportEvent $event): void
+    {
+        $player = $event->getEntity();
+        if (!$player instanceof Player) {
+            return;
+        }
+        $session = $this->getPlugin()->getSessionManager()->getSession($player->getUniqueId()->toString());
+        if ($event->getTo()->getWorld()->getFolderName() === $this->getPlugin()->getServer()->getWorldManager()->getDefaultWorld()->getFolderName()) {
+            if ($session->isInDuel()) {
+                $session->getDuel()->removeFromDuel($session, $session->getDuel()->isAlive($session->getPlayer()->getUniqueId()->toString()));
+            }
+            $player->getInventory()->clearAll();
+            $player->getArmorInventory()->clearAll();
+            $player->getCursorInventory()->clearAll();
+            $player->getInventory()->setItem(2, ItemFactory::getInstance()->get(ItemIds::POPPY)->setCustomName(TextFormat::RESET . TextFormat::BOLD . TextFormat::AQUA . "Cosmetics"));
+            $player->getInventory()->setItem(4, ItemFactory::getInstance()->get(ItemIds::COMPASS)->setCustomName(TextFormat::RESET . TextFormat::BOLD . TextFormat::GREEN . "Warps"));
+            $player->getInventory()->setItem(6, ItemFactory::getInstance()->get(ItemIds::DIAMOND_SWORD)->setCustomName(TextFormat::RESET . TextFormat::BOLD . TextFormat::YELLOW . "Duels"));
+        }
+    }
 
 
     public function onPlace(BlockPlaceEvent $event): void
@@ -103,6 +130,10 @@ class PvPCoreListener implements Listener
         $item = $event->getItem()->getCustomName();
         $block = $event->getBlock()->getPos()->asVector3();
         $session = $this->getPlugin()->getSessionManager()->getSession($player->getUniqueId()->toString());
+        if (!$player->hasPermission("pvpcore.admin") && !$player->isCreative()) {
+            $event->cancel();
+            return;
+        }
         $setupMode = $session->getSetupMode();
         if (!$setupMode instanceof ParkourSetupMode) {
             return;
@@ -140,15 +171,6 @@ class PvPCoreListener implements Listener
         $duel = $session->getDuel();
         if ($session->isInDuel()) {
             $duel->broadcastMessage($this->plugin->getConfig()->get("gameChat"), ["{PLAYER}" => $session->getStatus() === PlayerStatusConstants::PLAYER_STATUS_SPECTATOR]);
-            $event->cancel();
-        }
-    }
-
-    public function onDrop(PlayerDropItemEvent $event): void
-    {
-        $player = $event->getPlayer();
-        $session = $this->getPlugin()->getSessionManager()->getSession($player->getUniqueId()->toString());
-        if ($session->isInDuel()) {
             $event->cancel();
         }
     }
@@ -269,13 +291,19 @@ class PvPCoreListener implements Listener
                 if ($setupMode instanceof DuelSetupMode) {
                     $this->getPlugin()->getDuelManager()->reloadArena($setupMode->getArena());
                 }
+                $player->teleport($this->getPlugin()->getServer()->getWorldManager()->getDefaultWorld()->getSpawnLocation());
+                $this->getPlugin()->getServer()->getWorldManager()->unloadWorld($this->getPlugin()->getServer()->getWorldManager()->getWorldByName($setupMode->getClonedWorld()));
+                $this->getPlugin()->getThreadPool()->submitTask(new RecursiveDeletionTask($this->getPlugin()->getServer()->getDataPath() . "worlds", [$setupMode->getClonedWorld()]));
+                $player->sendMessage(TextFormat::GREEN . "You've successfully quit the setup mode.");
+                $player->setGamemode($this->getPlugin()->getServer()->getGamemode());
                 $setupMode->deactivate();
                 $session->setSetupMode(null);
-                $player->setGamemode($this->getPlugin()->getServer()->getGamemode());
-                $player->sendMessage(TextFormat::GREEN . "You've successfully quit the setup mode.");
-                // No need to wait for it to load.
-                $player->teleport($this->getPlugin()->getServer()->getWorldManager()->getDefaultWorld()->getSpawnLocation());
         }
+    }
+
+    public function onExhaust(PlayerExhaustEvent $event): void
+    {
+        $event->cancel();
     }
 
     public function onEntityDamageByEntity(EntityDamageByEntityEvent $event): void
@@ -290,13 +318,13 @@ class PvPCoreListener implements Listener
                 if (!$mode) {
                     return;
                 }
-                $callback = function (Player $receiver, bool $data) use ($player, $mode) : void {
+                $callback = function (Player $receiver, bool $data) use ($player, $mode): void {
                     if ($data) {
                         $receiver = $this->getPlugin()->getSessionManager()->getSession($receiver->getUniqueId()->toString());
                         $player = $this->getPlugin()->getSessionManager()->getSession($player->getUniqueId()->toString());
                         $this->getPlugin()->getDuelManager()->queueToDuel([$receiver, $player], $mode);
                     } else {
-                        $player->sendMessage(Language::getMessage("duelDeclineMessage". ["{PLAYER}" => $receiver->getName()]));
+                        $player->sendMessage(Language::getMessage("duelDeclineMessage" . ["{PLAYER}" => $receiver->getName()]));
                     }
                 };
                 $form = new ModalForm();
@@ -304,6 +332,8 @@ class PvPCoreListener implements Listener
                 $form->setTitle($player->getName() . " wants to duel you");
                 $form->setFirstButton("Accept");
                 $form->setFirstButton("Decline");
+                $form->setCallback($callback);
+                $target->sendForm($form);
             };
             $form = new NormalForm();
             $form->setTitle("Duels");
@@ -315,6 +345,7 @@ class PvPCoreListener implements Listener
                 }
                 $form->addButton(ucwords($mode));
             }
+            $form->setCallback($callback);
             $player->sendForm($form);
         }
     }

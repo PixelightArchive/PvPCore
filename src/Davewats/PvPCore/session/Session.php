@@ -102,7 +102,9 @@ class Session
 
     public function save(): void
     {
-        $this->getPlugin()->getDatabase()->submitTask(new PlayerDataUpdateTask($this->getPlayer()->getXuid(), $this->getDataCache()->getKills(), $this->getDataCache()->getDeaths(), $this->getDataCache()->getStreak(), $this->getDataCache()->getWins(), $this->getDataCache()->getLoses(), $this->getDataCache()->getDuelStreak()));
+        if ($this->getDataCache()->isLoaded()) {
+            $this->getPlugin()->getDatabase()->submitTask(new PlayerDataUpdateTask($this->getPlayer()->getXuid(), $this->getDataCache()->getKills(), $this->getDataCache()->getDeaths(), $this->getDataCache()->getStreak(), $this->getDataCache()->getWins(), $this->getDataCache()->getLoses(), $this->getDataCache()->getDuelStreak()));
+        }
     }
 
     public function getPlugin(): PvPCore

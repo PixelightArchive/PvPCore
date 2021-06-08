@@ -26,9 +26,11 @@ class ParkourSetupMode extends SetupMode
 
     protected function onActivate(): void
     {
-        $this->session->getPlayer()->sendMessage(TextFormat::GREEN . "You've entered the setup mode, use the items in your inventory to set the locations.");
-        $this->session->getPlayer()->getInventory()->setItem(2, ItemFactory::getInstance()->get(ItemIds::HEAVY_WEIGHTED_PRESSURE_PLATE)->setCustomName(TextFormat::RESET . TextFormat::GRAY . "Add Checkpoint"));
-        $this->session->getPlayer()->getInventory()->setItem(4, ItemFactory::getInstance()->get(ItemIds::LIGHT_WEIGHTED_PRESSURE_PLATE)->setCustomName(TextFormat::RESET . TextFormat::AQUA . "Set Starting point"));
-        $this->session->getPlayer()->getInventory()->setItem(6, ItemFactory::getInstance()->get(ItemIds::LIGHT_WEIGHTED_PRESSURE_PLATE)->setCustomName(TextFormat::RESET . TextFormat::GOLD . "Set Endpoint"));
+        if ($this->getSession()->getPlayer()->isConnected()) {
+            $this->getSession()->getPlayer()->sendMessage(TextFormat::GREEN . "You've entered the setup mode, use the items in your inventory to set the locations.");
+            $this->getSession()->getPlayer()->getInventory()->setItem(2, ItemFactory::getInstance()->get(ItemIds::HEAVY_WEIGHTED_PRESSURE_PLATE)->setCustomName(TextFormat::RESET . TextFormat::GRAY . "Add Checkpoint"));
+            $this->getSession()->getPlayer()->getInventory()->setItem(4, ItemFactory::getInstance()->get(ItemIds::LIGHT_WEIGHTED_PRESSURE_PLATE)->setCustomName(TextFormat::RESET . TextFormat::AQUA . "Set Starting point"));
+            $this->getSession()->getPlayer()->getInventory()->setItem(6, ItemFactory::getInstance()->get(ItemIds::LIGHT_WEIGHTED_PRESSURE_PLATE)->setCustomName(TextFormat::RESET . TextFormat::GOLD . "Set Endpoint"));
+        }
     }
 }

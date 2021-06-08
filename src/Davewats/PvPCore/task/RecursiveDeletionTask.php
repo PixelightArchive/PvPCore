@@ -20,7 +20,7 @@ class RecursiveDeletionTask extends CallbackTask
     public function onRun(): void
     {
         foreach (unserialize($this->folders) as $folder) {
-            if ($folder === "." || $folder === "..") {
+            if ($folder === null || $folder === "." || $folder === "..") {
                 continue;
             }
             Utils::recursiveDelete($this->source . DIRECTORY_SEPARATOR . basename($folder));
