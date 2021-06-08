@@ -9,6 +9,7 @@ use Davewats\PvPCore\task\RecursiveDeletionTask;
 use Davewats\PvPCore\thread\PvPCoreThreadPool;
 use pocketmine\item\ItemFactory;
 use pocketmine\item\ItemIds;
+use pocketmine\Server;
 use pocketmine\utils\TextFormat;
 
 class DuelSetupMode extends SetupMode
@@ -37,9 +38,11 @@ class DuelSetupMode extends SetupMode
 
     protected function onDeactivate(): void
     {
+        $server = Server::getInstance();
+        $server->getWorldManager()->unloadWorld($server->getWorldManager()->getWorldByName($this->getClonedWorld()));
+        PvPCoreThreadPool::getInstance()->submitTask(new RecursiveDeletionTask($this->getSession()->getPlugin()->getServer()->getDataPath() . "worlds", [$this->getClonedWorld()]));
         $this->setArena(null);
         $this->setClonedWorld(null);
-        PvPCoreThreadPool::getInstance()->submitTask(new RecursiveDeletionTask($this->getSession()->getPlugin()->getServer()->getDataPath() . "worlds", [$this->getClonedWorld()]));
     }
 
     public function getClonedWorld(): ?string

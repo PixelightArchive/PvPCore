@@ -201,6 +201,7 @@ class DuelCommand extends Command
                             $gameWorld->requestChunkPopulation($spawn->getFloorX() >> 4, $spawn->getFloorZ() >> 4, null)->onCompletion(
                                 function () use ($player, $session, $spawn, $name, $randomId): void {
                                     if (!$player->isConnected()) {
+                                        $this->plugin->getThreadPool()->submitTask(new RecursiveDeletionTask($this->plugin->getServer()->getDataPath() . "worlds", ["duel-setup-" . $randomId]));
                                         return;
                                     }
                                     $setupMode = new DuelSetupMode($session);
@@ -254,7 +255,7 @@ class DuelCommand extends Command
                     $this->plugin->getDuelManager()->queueToDuel([$session], null, $mode, true);
                 });
                 foreach ($this->plugin->getDuelManager()->getModes() as $mode => $data) {
-                    if ($data["icon"] !== null) {
+                    if (isset($data["icon"]) && $data["icon"] !== "") {
                         $form->addButton(ucwords($mode), strpos("http", $data["icon"]) === 0 ? NormalForm::IMAGE_TYPE_URL : NormalForm::IMAGE_TYPE_PATH, $data["icon"]);
                         continue;
                     }

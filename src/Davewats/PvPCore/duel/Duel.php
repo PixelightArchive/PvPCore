@@ -128,7 +128,6 @@ class Duel
         $session->getPlayer()->getHungerManager()->setFood(20);
         $session->getPlayer()->setGamemode(GameMode::ADVENTURE());
         $session->getPlayer()->setImmobile();
-        $session->getPlayer()->getInventory()->setItem(0, ItemFactory::getInstance()->get(ItemIds::BOW)->setCustomName(TextFormat::RESET . TextFormat::GOLD . "Kit Selector"));
         $session->getPlayer()->getInventory()->setItem(8, ItemFactory::getInstance()->get(ItemIds::BED, 14)->setCustomName(TextFormat::RESET . TextFormat::RED . "Back to Lobby"));
         $session->getPlayer()->teleport(Position::fromObject($position->add(0.5, 0, 0.5), $this->getWorld()), 0, 0);
         $session->setDuel($this);
@@ -522,7 +521,6 @@ class Duel
         $this->broadcastTitle("gameStartTitle", "gameStartSubtitle", ["{MODE}" => $this->mode, "{MAP}" => $this->map, "{PLAYERS}" => count($this->getAlivePlayers())]);
         foreach ($this->sessions as $session) {
             $session->getPlayer()->setImmobile(false);
-            $session->getPlayer()->getInventory()->remove(ItemFactory::getInstance()->get(ItemIds::BOW)->setCustomName(TextFormat::RESET . TextFormat::GOLD . "Kit Selector"));
             $session->getPlayer()->getInventory()->remove(ItemFactory::getInstance()->get(ItemIds::BED, 14)->setCustomName(TextFormat::RESET . TextFormat::RED . "Back to Lobby"));
             $session->getPlayer()->getCursorInventory()->clearAll();
             $session->getPlayer()->getInventory()->clearAll();

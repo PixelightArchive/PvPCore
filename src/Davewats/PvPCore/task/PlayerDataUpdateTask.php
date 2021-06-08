@@ -32,21 +32,17 @@ class PlayerDataUpdateTask extends MySQLQueryTask
 
     public function query(mysqli $database): void
     {
-        try {
-            $xuid = $this->getXuid();
-            $kills = $this->getKills();
-            $deaths = $this->getDeaths();
-            $streak = $this->getStreak();
-            $duel_wins = $this->getDuelWins();
-            $duel_loses = $this->getDuelLoses();
-            $duel_streak = $this->getDuelStreak();
-            $statement = $database->prepare(PlayerDataUpdateTask::DATA_UPDATE_QUERY);
-            $statement->bind_param("sssssss", $kills, $deaths, $streak, $duel_wins, $duel_loses, $duel_streak, $xuid);
-            $statement->execute();
-            $statement->close();
-        } catch (Exception $exception) {
-            var_dump($exception->getMessage());
-        }
+        $xuid = $this->getXuid();
+        $kills = $this->getKills();
+        $deaths = $this->getDeaths();
+        $streak = $this->getStreak();
+        $duel_wins = $this->getDuelWins();
+        $duel_loses = $this->getDuelLoses();
+        $duel_streak = $this->getDuelStreak();
+        $statement = $database->prepare(PlayerDataUpdateTask::DATA_UPDATE_QUERY);
+        $statement->bind_param("sssssss", $kills, $deaths, $streak, $duel_wins, $duel_loses, $duel_streak, $xuid);
+        $statement->execute();
+        $statement->close();
     }
 
     public function getKills(): int

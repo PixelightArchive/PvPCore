@@ -108,7 +108,6 @@ class ParkourSession
             return;
         }
         $this->current++;
-        var_dump($this->current);
         $this->teleportToCheckpoint($this->getCurrent());
     }
 

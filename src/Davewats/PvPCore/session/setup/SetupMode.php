@@ -31,7 +31,6 @@ abstract class SetupMode
         $this->getSession()->getPlayer()->getArmorInventory()->clearAll();
         $this->getSession()->getPlayer()->getCursorInventory()->clearAll();
         $this->getSession()->getPlayer()->setGamemode(GameMode::CREATIVE());
-        $this->onDeactivate();
         $this->session->getPlayer()->getInventory()->setItem(8, ItemFactory::getInstance()->get(ItemIds::BED, 14)->setCustomName(TextFormat::RESET . TextFormat::RED . "Quit Setup Mode"));
         $this->activated = true;
         $this->onActivate();
