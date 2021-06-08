@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Davewats\PvPCore\task;
 
 use Davewats\PvPCore\database\MySQLQueryTask;
-use Exception;
 use mysqli;
 
 class PlayerDataUpdateTask extends MySQLQueryTask

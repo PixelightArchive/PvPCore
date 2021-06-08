@@ -50,6 +50,7 @@ class SessionManager
         if (!$this->hasSession($uid)) {
             return false;
         }
+        unset($this->sessions[$uid]);
         return true;
     }
 
