@@ -262,7 +262,7 @@ class PvPCoreListener implements Listener
                 break;
             case TextFormat::RESET . TextFormat::RED . "Quit Setup Mode":
                 if (!$session->getSetupMode()->isActivated()) {
-                    $player->sendMessage("You can only perform this action in setup mode.");
+                    $player->sendMessage("You can only perform this action in the setup mode.");
                     return;
                 }
                 $setupMode = $session->getSetupMode();
