@@ -326,7 +326,7 @@ class PvPCoreListener implements Listener
                             $sender = $this->getPlugin()->getSessionManager()->getSession($sender->getUniqueId()->toString());
                             $this->getPlugin()->getDuelManager()->queueToDuel([$receiver, $sender], $mode);
                         } else {
-                            $sender->sendMessage(Language::getMessage("duelDeclineMessage" . ["{PLAYER}" => $receiver->getName()]));
+                            $sender->sendMessage(Language::getMessage("duelDeclineMessage", ["{PLAYER}" => $receiver->getName()]));
                         }
                     };
                     $form = new ModalForm();
@@ -349,6 +349,7 @@ class PvPCoreListener implements Listener
                 }
                 $form->setCallback($callback);
                 $attacker->sendForm($form);
+                $event->cancel();
                 return;
             }
         }
