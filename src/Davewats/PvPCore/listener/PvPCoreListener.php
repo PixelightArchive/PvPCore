@@ -306,59 +306,50 @@ class PvPCoreListener implements Listener
         $event->cancel();
     }
 
-    /**
-     * @param EntityDamageByEntityEvent $event
-     * @priority HIGHEST
-     */
-    public function onEntityDamageByEntity(EntityDamageByEntityEvent $event): void
-    {
-        $player = $event->getDamager();
-        $target = $event->getEntity();
-        if (!$player instanceof Player || !$target instanceof Player) {
-            return;
-        }
-        if ($player->getInventory()->getItemInHand() === TextFormat::RESET . TextFormat::BOLD . TextFormat::YELLOW . "Duels") {
-            $callback = function (Player $player, ?string $mode) use ($target): void {
-                if (!$mode) {
-                    return;
-                }
-                $callback = function (Player $receiver, bool $data) use ($player, $mode): void {
-                    if ($data) {
-                        $receiver = $this->getPlugin()->getSessionManager()->getSession($receiver->getUniqueId()->toString());
-                        $player = $this->getPlugin()->getSessionManager()->getSession($player->getUniqueId()->toString());
-                        $this->getPlugin()->getDuelManager()->queueToDuel([$receiver, $player], $mode);
-                    } else {
-                        $player->sendMessage(Language::getMessage("duelDeclineMessage" . ["{PLAYER}" => $receiver->getName()]));
-                    }
-                };
-                $form = new ModalForm();
-                $form->setCallback($callback);
-                $form->setTitle($player->getName() . " wants to duel you");
-                $form->setFirstButton("Accept");
-                $form->setFirstButton("Decline");
-                $form->setCallback($callback);
-                $target->sendForm($form);
-            };
-            $form = new NormalForm();
-            $form->setTitle("Duels");
-            $form->setContent("Select a mode:");
-            foreach ($this->plugin->getDuelManager()->getModes() as $mode => $data) {
-                if ($data["icon"] !== null) {
-                    $form->addButton(ucwords($mode), strpos("http", $data["icon"]) === 0 ? NormalForm::IMAGE_TYPE_URL : NormalForm::IMAGE_TYPE_PATH, $data["icon"]);
-                    continue;
-                }
-                $form->addButton(ucwords($mode));
-            }
-            $form->setCallback($callback);
-            $player->sendForm($form);
-        }
-    }
-
     public function onDamage(EntityDamageEvent $event): void
     {
         $player = $event->getEntity();
         $cause = $event->getCause();
         if (!$player instanceof Player) {
+            return;
+        }
+        if ($event instanceof EntityDamageByEntityEvent) {
+            $attacker = $event->getDamager();
+            if ($attacker instanceof Player && $attacker->getInventory()->getItemInHand() === TextFormat::RESET . TextFormat::BOLD . TextFormat::YELLOW . "Duels") {
+                $callback = function (Player $sender, ?string $mode) use ($player): void {
+                    if (!$mode) {
+                        return;
+                    }
+                    $callback = function (Player $receiver, bool $data) use ($sender, $mode): void {
+                        if ($data) {
+                            $receiver = $this->getPlugin()->getSessionManager()->getSession($receiver->getUniqueId()->toString());
+                            $sender = $this->getPlugin()->getSessionManager()->getSession($sender->getUniqueId()->toString());
+                            $this->getPlugin()->getDuelManager()->queueToDuel([$receiver, $sender], $mode);
+                        } else {
+                            $sender->sendMessage(Language::getMessage("duelDeclineMessage" . ["{PLAYER}" => $receiver->getName()]));
+                        }
+                    };
+                    $form = new ModalForm();
+                    $form->setCallback($callback);
+                    $form->setTitle($player->getName() . " wants to duel you");
+                    $form->setFirstButton("Accept");
+                    $form->setFirstButton("Decline");
+                    $form->setCallback($callback);
+                    $player->sendForm($form);
+                };
+                $form = new NormalForm();
+                $form->setTitle("Duels");
+                $form->setContent("Select a mode:");
+                foreach ($this->plugin->getDuelManager()->getModes() as $mode => $data) {
+                    if ($data["icon"] !== null) {
+                        $form->addButton(ucwords($mode), strpos("http", $data["icon"]) === 0 ? NormalForm::IMAGE_TYPE_URL : NormalForm::IMAGE_TYPE_PATH, $data["icon"]);
+                        continue;
+                    }
+                    $form->addButton(ucwords($mode));
+                }
+                $form->setCallback($callback);
+                $attacker->sendForm($form);
+            }
             return;
         }
         $session = $this->getPlugin()->getSessionManager()->getSession($player->getUniqueId()->toString());

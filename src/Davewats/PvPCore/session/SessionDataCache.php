@@ -41,15 +41,12 @@ class SessionDataCache
         $this->duel_streak = $duel_streak;
     }
 
-    public function getKDR(): float
+    public function getKDR(): string
     {
-        $kdr = 0.0;
-        try {
-            $kdr = $this->getKills() / $this->getDeaths();
-        } catch (\Exception $exception) {
-            $kdr = 0.0;
+        if ($this->getKills() <= 0 || $this->getDeaths() <= 0) {
+            return "0.0";
         }
-        return $kdr;
+        return number_format($this->getKills() / $this->getDeaths(), 1);
     }
 
     public function getKills(): int
@@ -72,12 +69,12 @@ class SessionDataCache
         $this->deaths = $deaths;
     }
 
-    public function getWLR(): float
+    public function getWLR(): string
     {
-        if ($this->getWins() <= 0 || $this->getLoses()) {
-            return 0.0;
+        if ($this->getWins() <= 0 || $this->getLoses() <= 0) {
+            return "0.0";
         }
-        return $this->getWins() / $this->getLoses();
+        return number_format($this->getWins() / $this->getLoses(), 1);
     }
 
     public function getWins(): int

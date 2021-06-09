@@ -499,7 +499,8 @@ class Duel
     public function getOpponent(Session $session): ?Session
     {
         foreach ($this->getAlivePlayers() as $opponents) {
-            if ($session->getPlayer()->getUniqueId()->toString() === $opponents->getPlayer()->getUniqueId()->toString()) {
+            // Don't check for UUIDS
+            if ($session->getPlayer()->getName() === $opponents->getPlayer()->getName()) {
                 continue;
             }
             return $opponents;

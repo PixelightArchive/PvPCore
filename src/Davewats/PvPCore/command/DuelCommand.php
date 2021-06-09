@@ -252,7 +252,7 @@ class DuelCommand extends Command
                     if (!$mode) {
                         return;
                     }
-                    $this->plugin->getDuelManager()->queueToDuel([$session], null, $mode, true);
+                    $this->plugin->getDuelManager()->queueToDuel([$session], null, strtolower(str_replace(" ", "_", $mode)), true);
                 });
                 foreach ($this->plugin->getDuelManager()->getModes() as $mode => $data) {
                     if (isset($data["icon"]) && $data["icon"] !== "") {
