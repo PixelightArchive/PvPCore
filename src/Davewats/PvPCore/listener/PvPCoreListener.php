@@ -162,7 +162,7 @@ class PvPCoreListener implements Listener
 
     /**
      * @param PlayerChatEvent $event
-     * @pirotry HIGHEST
+     * @priority HIGHEST
      */
     public function onChat(PlayerChatEvent $event): void
     {
@@ -306,6 +306,10 @@ class PvPCoreListener implements Listener
         $event->cancel();
     }
 
+    /**
+     * @param EntityDamageByEntityEvent $event
+     * @priority HIGHEST
+     */
     public function onEntityDamageByEntity(EntityDamageByEntityEvent $event): void
     {
         $player = $event->getDamager();
@@ -350,10 +354,6 @@ class PvPCoreListener implements Listener
         }
     }
 
-    /**
-     * @param EntityDamageEvent $event
-     * @pirotry HIGHEST
-     */
     public function onDamage(EntityDamageEvent $event): void
     {
         $player = $event->getEntity();
