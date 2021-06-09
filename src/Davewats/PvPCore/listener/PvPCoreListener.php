@@ -349,8 +349,8 @@ class PvPCoreListener implements Listener
                 }
                 $form->setCallback($callback);
                 $attacker->sendForm($form);
+                return;
             }
-            return;
         }
         $session = $this->getPlugin()->getSessionManager()->getSession($player->getUniqueId()->toString());
         $duel = $session->getDuel();
