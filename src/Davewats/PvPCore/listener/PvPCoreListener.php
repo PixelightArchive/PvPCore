@@ -341,7 +341,7 @@ class PvPCoreListener implements Listener
                 $form->setTitle("Duels");
                 $form->setContent("Select a mode:");
                 foreach ($this->plugin->getDuelManager()->getModes() as $mode => $data) {
-                    if ($data["icon"] !== null) {
+                    if (isset($data["icon"]) && $data["icon"] !== "") {
                         $form->addButton(ucwords($mode), strpos("http", $data["icon"]) === 0 ? NormalForm::IMAGE_TYPE_URL : NormalForm::IMAGE_TYPE_PATH, $data["icon"]);
                         continue;
                     }
