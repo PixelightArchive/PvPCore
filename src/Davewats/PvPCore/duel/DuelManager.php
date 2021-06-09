@@ -102,7 +102,7 @@ class DuelManager
             }
             $availableDuels[$index] = $duel;
         }
-        if (count($availableDuels) >= 1 && count($queues) <= 1) {
+        if (count($availableDuels) >= 1 && count($queues) >= 1) {
             foreach ($queues as $queue) {
                 $game = $this->duels[array_rand($availableDuels)];
                 $game->addToDuel($queue);
