@@ -315,7 +315,7 @@ class PvPCoreListener implements Listener
         }
         if ($event instanceof EntityDamageByEntityEvent) {
             $attacker = $event->getDamager();
-            if ($attacker instanceof Player && $attacker->getInventory()->getItemInHand() === TextFormat::RESET . TextFormat::BOLD . TextFormat::YELLOW . "Duels") {
+            if ($attacker instanceof Player && $attacker->getInventory()->getItemInHand()->getCustomName() === TextFormat::RESET . TextFormat::BOLD . TextFormat::YELLOW . "Duels") {
                 $callback = function (Player $sender, ?string $mode) use ($player): void {
                     if (!$mode) {
                         return;
