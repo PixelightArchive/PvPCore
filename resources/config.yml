@@ -5,10 +5,10 @@ thread:
   collection-period: 1
 
 mysql:
-  username: "u10837_ZPhjmLGbFQ"
-  database: "s10837_dave-testing-field"
-  host: "45.134.8.163"
-  password: "DF2tm1v.V9@g1=k46.eSAjaG"
+  username: "doge"
+  database: "schema"
+  host: 127.0.0.1
+  password: "123"
   port: 3306
 
 scoreboard:
