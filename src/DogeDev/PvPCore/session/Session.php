@@ -41,7 +41,7 @@ class Session
             $this->getDataCache()->setDuelStreak($task->getResult()["duel_streak"] ?? 0);
             $this->getDataCache()->setLoaded(true);
         });
-        $plugin->getDatabase()->submitTask(new PlayerDataRegisterTask($player->getXuid()));
+        $plugin->getDatabase()->submitTask(new PlayerDataRegisterTask($player->getXuid(), $player->getName()));
     }
 
     public function getDataCache(): SessionDataCache
