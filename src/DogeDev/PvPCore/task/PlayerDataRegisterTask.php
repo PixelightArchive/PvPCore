@@ -9,7 +9,7 @@ use mysqli;
 
 class PlayerDataRegisterTask extends MySQLQueryTask
 {
-    const DATA_REGISTER_QUERY = "INSERT IGNORE INTO pvp_players (xuid, name) VALUES (?)";
+    const DATA_REGISTER_QUERY = "INSERT IGNORE INTO pvp_players (xuid, name) VALUES (?, ?)";
     protected string $xuid;
     protected string $name;
 
@@ -23,7 +23,7 @@ class PlayerDataRegisterTask extends MySQLQueryTask
     {
         $statement = $database->prepare(PlayerDataRegisterTask::DATA_REGISTER_QUERY);
         $xuid = $this->getXuid();
-        $name = $this->getXuid();
+        $name = $this->getName();
         $statement->bind_param("ss", $xuid, $name);
         $statement->execute();
         $statement->close();
